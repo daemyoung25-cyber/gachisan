@@ -1,5 +1,5 @@
 /* Bump CACHE on every deploy so phones fetch the new files. */
-const CACHE = "gachisan-202610202200";
+const CACHE = "gachisan-202610202300";
 const LIBS = "gachisan-libs";
 const TILES = "gachisan-tiles";
 const MAX_TILES = 6000;
