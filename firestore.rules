@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // A device joins a family by registering itself under groups/{code}/devices/{uid}.
+    // Knowing the 8-character invite code is what lets someone join.
+    function joined(g) {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/groups/$(g)/devices/$(request.auth.uid));
+    }
+    match /groups/{g} {
+      allow get: if request.auth != null;
+      allow create: if request.auth != null && g.size() == 8;
+      allow update: if joined(g);
+      match /devices/{uid} {
+        allow create, update: if request.auth != null && request.auth.uid == uid
+          && exists(/databases/$(database)/documents/groups/$(g));
+        allow read: if joined(g);
+      }
+      match /{col}/{id} {
+        allow read, write: if col in ['people', 'hikes', 'stamps', 'photos'] && joined(g);
+      }
+    }
+  }
+}
